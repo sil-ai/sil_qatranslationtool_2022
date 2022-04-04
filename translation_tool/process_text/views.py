@@ -499,3 +499,16 @@ def post_question(request, id_, idx):
                 }})
 
             return JsonResponse(response)
+
+#restore missing function to prevent error
+def get_semdom_data(request):
+    global DB
+    col = DB.textpair
+    semdom_data = []
+    if request.user.is_authenticated:
+        user = DB.user.find_one({'username': str(request.user)})
+        tpId = user['translations'][-1]
+        data = col.find_one({'_id':tpId})
+        for pair in data['matches']:
+            semdom_data.append(float(pair['semdom_score']))
+    return JsonResponse({'data': semdom_data})
